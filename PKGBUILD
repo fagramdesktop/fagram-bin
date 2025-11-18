@@ -17,7 +17,7 @@ provides=('fagram')
 conflicts=('fagram')
 options=(!debug)
 
-source=("https://github.com/burhancodes/fagram-rpm/releases/download/v${pkgver}/fagram-v${pkgver}.tar.gz")
+source=("https://github.com/burhancodes/fagram-rpm/releases/download/v${pkgver}/fagram-${pkgver}.tar.gz")
 
 sha256sums=('SKIP')
 

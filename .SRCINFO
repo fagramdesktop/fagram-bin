@@ -33,7 +33,7 @@ pkgbase = fagram-bin
     optdepends = xdg-desktop-portal: desktop integration
     provides = fagram
     conflicts = fagram
-    source = https://github.com/burhancodes/fagram-rpm/releases/download/v${pkgver}/fagram-v${pkgver}.tar.gz
+    source = https://github.com/burhancodes/fagram-rpm/releases/download/v${pkgver}/fagram-${pkgver}.tar.gz
     sha256sums = SKIP
 
 pkgname = fagram-bin
