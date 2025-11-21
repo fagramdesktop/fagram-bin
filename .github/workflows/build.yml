@@ -105,9 +105,9 @@ jobs:
             
             # Download source and calculate SHA256
             rm -rf pkg src *.tar.gz
-            TAR_URL="https://github.com/burhancodes/fagram-rpm/releases/download/${TAG_VERSION}/fagram-${TAG_VERSION}.tar.gz"
-            curl -L "$TAR_URL" -o "fagram-${TAG_VERSION}.tar.gz" || { echo "Download failed"; exit 1; }
-            CHECKSUM=$(sha256sum "fagram-${TAG_VERSION}.tar.gz" | awk '{print $1}')
+            TAR_URL="https://github.com/burhancodes/fagram-rpm/releases/download/${TAG_VERSION}/fagram-${NEW_VERSION}.tar.gz"
+            curl -L "$TAR_URL" -o "fagram-${NEW_VERSION}.tar.gz" || { echo "Download failed"; exit 1; }
+            CHECKSUM=$(sha256sum "fagram-${NEW_VERSION}.tar.gz" | awk '{print $1}')
             sed -i "s/sha256sums=('.*')/sha256sums=('$CHECKSUM')/" PKGBUILD
             
             COMMIT_MSG="Update to $NEW_VERSION"
