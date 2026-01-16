@@ -4,7 +4,7 @@ pkgver=1.1.11
 pkgrel=1
 pkgdesc="Telegram Desktop based messenger with Feature-rich modifications."
 arch=(x86_64)
-url="https://github.com/burhancodes/fagramdesktop"
+url="https://github.com/fagramdesktop/fadesktop"
 license=(GPL3)
 depends=('hunspell' 'ffmpeg' 'hicolor-icon-theme' 'lz4' 'minizip' 'openal'
          'qt6-imageformats' 'qt6-svg' 'qt6-wayland' 'xxhash' 'ada'
@@ -17,7 +17,7 @@ provides=('fagram')
 conflicts=('fagram')
 options=(!debug)
 
-source=("https://github.com/burhancodes/fagram-rpm/releases/download/v${pkgver}/fagram-${pkgver}.tar.gz")
+source=("https://github.com/fagramdesktop/fagram-rpm/releases/download/v${pkgver}/fagram-${pkgver}.tar.gz")
 
 sha256sums=('SKIP')
 
