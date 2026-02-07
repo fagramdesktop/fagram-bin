@@ -57,28 +57,49 @@ jobs:
           echo "Latest version (without v): $LATEST_VERSION"
           
           CURRENT_VERSION=$(grep -oP 'pkgver=\K.*' PKGBUILD | tr -d '"')
+          CURRENT_REL=$(grep -oP 'pkgrel=\K.*' PKGBUILD | tr -d '"')
           echo "Current version: $CURRENT_VERSION"
+          echo "Current pkgrel: $CURRENT_REL"
           
           # Clone AUR repo to check for differences
           git clone ssh://aur@aur.archlinux.org/fagram-bin.git aur-repo-check || { echo "Clone failed"; exit 1; }
           
-          # Check if PKGBUILD or any files have changed
+          AUR_VERSION=$(grep -oP 'pkgver=\K.*' aur-repo-check/PKGBUILD | tr -d '"')
+          AUR_REL=$(grep -oP 'pkgrel=\K.*' aur-repo-check/PKGBUILD | tr -d '"')
+          echo "AUR version: $AUR_VERSION"
+          echo "AUR pkgrel: $AUR_REL"
+          
+          UPDATE_NEEDED=false
+          UPDATE_TYPE=""
+          
+          # Check for version change (new upstream release)
           if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
             echo "Version update needed: $CURRENT_VERSION -> $LATEST_VERSION"
-            echo "update_needed=true" >> $GITHUB_OUTPUT
-            echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
-            echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
-            echo "update_type=version" >> $GITHUB_OUTPUT
+            UPDATE_NEEDED=true
+            UPDATE_TYPE="version"
+          # Check for pkgver difference with AUR
+          elif [ "$CURRENT_VERSION" != "$AUR_VERSION" ]; then
+            echo "pkgver differs from AUR: $AUR_VERSION -> $CURRENT_VERSION"
+            UPDATE_NEEDED=true
+            UPDATE_TYPE="pkgbuild"
+          # Check for pkgrel difference with AUR
+          elif [ "$CURRENT_REL" != "$AUR_REL" ]; then
+            echo "pkgrel differs from AUR: $AUR_REL -> $CURRENT_REL"
+            UPDATE_NEEDED=true
+            UPDATE_TYPE="pkgbuild"
+          # Check for any other PKGBUILD changes
           elif ! diff -q PKGBUILD aur-repo-check/PKGBUILD > /dev/null 2>&1; then
-            echo "PKGBUILD has changes (possibly pkgrel update)"
-            echo "update_needed=true" >> $GITHUB_OUTPUT
-            echo "latest_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-            echo "latest_tag=v$CURRENT_VERSION" >> $GITHUB_OUTPUT
-            echo "update_type=pkgbuild" >> $GITHUB_OUTPUT
+            echo "PKGBUILD has other changes"
+            UPDATE_NEEDED=true
+            UPDATE_TYPE="pkgbuild"
           else
             echo "No changes detected"
-            echo "update_needed=false" >> $GITHUB_OUTPUT
           fi
+          
+          echo "update_needed=$UPDATE_NEEDED" >> $GITHUB_OUTPUT
+          echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "update_type=$UPDATE_TYPE" >> $GITHUB_OUTPUT
           
           # Cleanup
           rm -rf aur-repo-check
@@ -111,25 +132,37 @@ jobs:
             
             COMMIT_MSG="Update to $NEW_VERSION"
           else
-            echo "Performing PKGBUILD update (likely pkgrel change)"
+            echo "Performing PKGBUILD update"
             CURRENT_VERSION=$(grep -oP 'pkgver=\K.*' PKGBUILD | tr -d '"')
             CURRENT_REL=$(grep -oP 'pkgrel=\K.*' PKGBUILD | tr -d '"')
-            COMMIT_MSG="Update PKGBUILD (pkgrel=$CURRENT_REL)"
+            COMMIT_MSG="Update PKGBUILD (pkgver=$CURRENT_VERSION, pkgrel=$CURRENT_REL)"
           fi
           
           # Generate .SRCINFO as non-root user in the current directory
           sudo -u builder bash -c "cd \"$PWD\" && makepkg --printsrcinfo > .SRCINFO" || { echo "Failed to generate .SRCINFO"; exit 1; }
           
-          git clone ssh://aur@aur.archlinux.org/fagram-bin.git aur-repo || { echo "Clone failed"; exit 1; }
+          # Push to AUR
+          git clone ssh://aur@aur.archlinux.org/fagram-bin.git aur-repo || { echo "AUR clone failed"; exit 1; }
           cp PKGBUILD .SRCINFO aur-repo/
           
           cd aur-repo
           git add PKGBUILD .SRCINFO
-          git commit -m "$COMMIT_MSG"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to push to AUR, skipping"
+          else
+            git commit -m "$COMMIT_MSG"
+            git push
+            echo "Package updated and pushed to AUR successfully"
+          fi
           cd ..
-          echo "Package updated and pushed to AUR successfully"
           rm -rf aur-repo
-          git add PKGBUILD .SRCINFO
-          git commit -m "$COMMIT_MSG"
           
+          # Push to GitHub
+          git add PKGBUILD .SRCINFO
+          if git diff --cached --quiet; then
+            echo "No changes to push to GitHub, skipping"
+          else
+            git commit -m "$COMMIT_MSG"
+            git push
+            echo "Changes pushed to GitHub successfully"
+          fi
