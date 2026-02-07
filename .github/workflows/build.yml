@@ -49,7 +49,7 @@ jobs:
         working-directory: ./workdir
         run: |
           set -e
-          LATEST_TAG=$(curl -s https://api.github.com/repos/fagramdesktop/fagram-rpm/releases/latest | jq -r .tag_name)
+          LATEST_TAG=$(curl -s https://api.github.com/repos/fagramdesktop/fadesktop/releases/latest | jq -r .tag_name)
           echo "Latest tag: $LATEST_TAG"
           
           # Strip the 'v' prefix for version comparison
@@ -99,13 +99,12 @@ jobs:
           
           if [ "$UPDATE_TYPE" = "version" ]; then
             echo "Performing version update to $NEW_VERSION"
-            # Update PKGBUILD with version without 'v' prefix
             sed -i "s/pkgver=.*/pkgver=$NEW_VERSION/" PKGBUILD
             sed -i "s/pkgrel=.*/pkgrel=1/" PKGBUILD
             
             # Download source and calculate SHA256
             rm -rf pkg src *.tar.gz
-            TAR_URL="https://github.com/fagramdesktop/fagram-rpm/releases/download/${TAG_VERSION}/fagram-${NEW_VERSION}.tar.gz"
+            TAR_URL="https://github.com/fagramdesktop/fadesktop/releases/download/${TAG_VERSION}/fagram-${NEW_VERSION}.tar.gz"
             curl -L "$TAR_URL" -o "fagram-${NEW_VERSION}.tar.gz" || { echo "Download failed"; exit 1; }
             CHECKSUM=$(sha256sum "fagram-${NEW_VERSION}.tar.gz" | awk '{print $1}')
             sed -i "s/sha256sums=('.*')/sha256sums=('$CHECKSUM')/" PKGBUILD
@@ -128,4 +127,9 @@ jobs:
           git add PKGBUILD .SRCINFO
           git commit -m "$COMMIT_MSG"
           git push
+          cd ..
+          echo "Package updated and pushed to AUR successfully"
+          rm -rf aur-repo
+          git add PKGBUILD .SRCINFO
+          git commit -m "$COMMIT_MSG"
           
