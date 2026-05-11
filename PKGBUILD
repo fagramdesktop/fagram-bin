@@ -6,13 +6,48 @@ pkgdesc="Telegram Desktop based messenger with Feature-rich modifications."
 arch=(x86_64)
 url="https://github.com/fagramdesktop/fadesktop"
 license=(GPL3)
-depends=('hunspell' 'ffmpeg' 'hicolor-icon-theme' 'lz4' 'minizip' 'openal'
-         'qt6-imageformats' 'qt6-svg' 'qt6-wayland' 'xxhash' 'ada'
-         'rnnoise' 'pipewire' 'libxtst' 'libxrandr' 'libxcomposite' 'libxdamage' 'abseil-cpp' 'libdispatch'
-         'openssl' 'protobuf' 'glib2' 'libsigc++-3.0' 'kcoreaddons' 'jemalloc' 'openh264')
+depends=(
+    'abseil-cpp'
+    'ada'
+    'ffmpeg'
+    'glib2'
+    'glibc'
+    'hicolor-icon-theme'
+    'hunspell'
+    'jemalloc'
+    'kcoreaddons'
+    'libavif'
+    'libdispatch'
+    'libgcc'
+    'libheif'
+    'libjxl'
+    'libstdc++'
+    'libxcomposite'
+    'libxdamage'
+    'libxrandr'
+    'libxtst'
+    'lz4'
+    'minizip'
+    'openal'
+    'openh264'
+    'openssl'
+    'pipewire'
+    'protobuf'
+    'qt6-imageformats'
+    'qt6-svg'
+    'qt6-wayland'
+    'rnnoise'
+    'xxhash'
+    'zlib'
+)
 makedepends=('chrpath')
-optdepends=('webkit2gtk: embedded browser features'
-            'xdg-desktop-portal: desktop integration')
+optdepends=(
+    'geoclue: geoinformation support'
+    'crow-translate: translation provider'
+    'webkit2gtk-4.1: embedded browser features provided by webkit2gtk-4.1'
+    'webkitgtk-6.0: embedded browser features provided by webkitgtk-6.0 (Wayland only)'
+    'xdg-desktop-portal: desktop integration'
+)
 provides=('fagram')
 conflicts=('fagram')
 options=(!debug)
