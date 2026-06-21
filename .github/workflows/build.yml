@@ -47,9 +47,12 @@ jobs:
       - name: Check for new release or changes
         id: check_release
         working-directory: ./workdir
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          LATEST_TAG=$(curl -s https://api.github.com/repos/fagramdesktop/fadesktop/releases/latest | jq -r .tag_name)
+          LATEST_RELEASE_JSON=$(curl -sSf -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/fagramdesktop/fadesktop/releases/latest)
+          LATEST_TAG=$(echo "$LATEST_RELEASE_JSON" | jq -r .tag_name)
           echo "Latest tag: $LATEST_TAG"
           
           # Strip the 'v' prefix for version comparison
