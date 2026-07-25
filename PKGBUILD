@@ -70,9 +70,11 @@ package() {
 
     # Application executable
     install -Dm755 "${srcdir}/usr/bin/fagram" "${pkgdir}/usr/bin/fagram"
+    install -Dm755 "${srcdir}/usr/bin/Updater" "${pkgdir}/usr/bin/Updater"
 
     # Remove RPATH informations
     chrpath --delete "${pkgdir}/usr/bin/fagram"
+    chrpath --delete "${pkgdir}/usr/bin/Updater"
 
     # Desktop launcher
     install -Dm644 "${srcdir}/usr/share/icons/hicolor/256x256/apps/org.fagram.png" "${pkgdir}/usr/share/pixmaps/fagram.png"
