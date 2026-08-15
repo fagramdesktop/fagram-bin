@@ -1,2 +1,5 @@
 aur
 *.pub
+/pkg/
+/src/
+*.tar.*
